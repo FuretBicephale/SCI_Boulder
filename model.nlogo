@@ -269,6 +269,13 @@ to-report rocks::moving?
   report default::moving?
 end
 
+to-report rocks::free?
+  let s ioda:my-target
+  face s
+  lt 180
+  report default::nothing-ahead? 1
+end
+
 to rocks::start-moving
   default::start-moving
 end
@@ -279,6 +286,13 @@ end
 
 to rocks::move-down
   default::move-down
+end
+
+to rocks::handle-push
+  let s ioda:my-target
+  face s
+  lt 180
+  default::move-forward
 end
 
 to rocks::create-blast
@@ -781,7 +795,6 @@ false
 0
 Polygon -13345367 true false 15 90 60 30 240 30 285 90 285 150 150 300 15 150
 Polygon -11221820 false false 60 30 240 30 285 90 285 150 150 300 15 150 15 90
-Line -11221820 false 30 150 30 150
 Line -11221820 false 15 150 285 150
 Line -11221820 false 15 90 285 90
 Line -11221820 false 120 30 90 90
