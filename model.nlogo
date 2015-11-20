@@ -408,6 +408,39 @@ to heros::increase-score
   set score score + 1
   set nb-to-collect nb-to-collect - 1
 end
+
+; blast-related primitives
+to-report blast::strong-enough?
+  report strength > 0
+end
+
+to blast::filter-neighbors
+  ioda:filter-neighbors-on-patches (patch-set patch-here patch-at 0 -1)
+end
+
+to blast::spread
+  set strength strength - 1
+  foreach [0 90 180 270] [
+    ; Verifier d'abord si il n'y a pas déjà un blast
+    hatch 1 [lt ? fd 1]
+    ; De même
+    hatch 1 [lt ? fd 1 lt 90 fd 1]
+  ]
+  ioda:die ; effacer le blast ?
+end
+
+to-report blast::target-here?
+  report ([patch-here] of ioda:my-target) = patch-here
+end
+
+; wall-related primitives
+to-report walls::destructible?
+  report destructible?
+end
+
+to walls::die
+  ioda:die
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
 482
@@ -600,7 +633,7 @@ CHOOSER
 level
 level
 "level0" "level1" "level2"
-1
+2
 
 MONITOR
 287

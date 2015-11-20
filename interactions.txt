@@ -78,5 +78,21 @@ end
 parallel interaction Push
   trigger      target-ahead?
   condition        moving? target:free?
-  actions      target:handle-push
+  actions      target:handle-push move-forward
+end
+
+parallel interaction Spread
+  condition    strong-enough?
+  actions      spread
+end
+
+parallel interaction Kill
+  trigger      target-here?
+  actions      target:die
+end
+
+parallel interaction Destroy
+  trigger      target-here?
+  condition    target:destructible?  
+  actions      target:die
 end
