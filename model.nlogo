@@ -419,13 +419,19 @@ to blast::filter-neighbors
 end
 
 to blast::spread
-  set strength strength - 1
-  foreach [0 90 180 270] [
-    ; Verifier d'abord si il n'y a pas déjà un blast
-    hatch 1 [lt ? fd 1]
-    ; De même
-    hatch 1 [lt ? fd 1 lt 90 fd 1]
+  if strength > 1 [
+    set strength strength - 1
+    foreach [0 90 180 270] [
+      ; Verifier d'abord si il n'y a pas déjà un blast
+      hatch 1 [lt ? fd 1]
+      ; De même
+      hatch 1 [lt ? fd 1 lt 90 fd 1]
+    ]
   ]
+  die
+end
+
+to blast::die
   ioda:die ; effacer le blast ?
 end
 

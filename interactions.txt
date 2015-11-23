@@ -82,7 +82,6 @@ parallel interaction Push
 end
 
 parallel interaction Spread
-  condition    strong-enough?
   actions      spread
 end
 
