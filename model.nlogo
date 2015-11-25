@@ -143,6 +143,7 @@ to init-blast [ dm? ]
   set color orange
   set strength 3
   set diamond-maker? dm?
+  set heading 0
 end
 
 to init-dirt
@@ -451,8 +452,8 @@ end
 GRAPHICS-WINDOW
 482
 10
-1242
-791
+727
+191
 -1
 -1
 30.0
@@ -466,8 +467,8 @@ GRAPHICS-WINDOW
 0
 1
 0
-24
--24
+4
+-4
 0
 1
 1
@@ -639,7 +640,7 @@ CHOOSER
 level
 level
 "level0" "level1" "level2"
-2
+0
 
 MONITOR
 287
