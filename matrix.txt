@@ -57,6 +57,9 @@ heros		Explode		 100    monsters	 0
 heros		Push 	 20		rocks		 1
 
 blast		Spread		100		UPDATE
+blast		Die		100		UPDATE
 blast		Kill		100		heros	0
 blast		Kill		100		monsters	0
 blast		Destroy		100		walls	0
+blast		Destroy		100		rocks	0
+blast		Destroy		100		diamonds	0

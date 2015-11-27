@@ -85,6 +85,12 @@ parallel interaction Spread
   actions      spread
 end
 
+parallel interaction Die
+  trigger      not:strong-enough?
+  condition    nothing-here?
+  actions      die
+end
+
 parallel interaction Kill
   trigger      target-here?
   actions      target:die

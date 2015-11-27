@@ -141,7 +141,7 @@ end
 to init-blast [ dm? ]
   ioda:init-agent
   set color orange
-  set strength 3
+  set strength 1
   set diamond-maker? dm?
   set heading 0
 end
@@ -246,10 +246,18 @@ to diamonds::move-down
 end
 
 to diamonds::create-blast
+  let target ioda:my-target
   let dm? ifelse-value ([breed] of ioda:my-target = monsters) [ [right-handed?] of ioda:my-target ] [ true ]
-  hatch-blast 1 [ init-blast dm? ]
+  hatch-blast 1 [
+    init-blast dm?
+    face target
+    fd 1
+  ]
 end
 
+to-report diamonds::destructible?
+  report true
+end
 to diamonds::die
   ioda:die
 end
@@ -297,15 +305,22 @@ to rocks::handle-push
 end
 
 to rocks::create-blast
+  let target ioda:my-target
   let dm? ifelse-value ([breed] of ioda:my-target = monsters) [ [right-handed?] of ioda:my-target ] [ true ]
-  hatch-blast 1 [ init-blast dm? ]
+  hatch-blast 1 [
+    init-blast dm?
+    face target
+    fd 1
+  ]
+end
+
+to-report rocks::destructible?
+  report true
 end
 
 to rocks::die
   ioda:die
 end
-
-
 
 ; monsters-related primitives
 
@@ -336,8 +351,13 @@ to monsters::die
 end
 
 to monsters::create-blast
+  let target ioda:my-target
   let dm? ifelse-value ([breed] of ioda:my-target = heros) [ true ] [ right-handed? ]
-  hatch-blast 1 [ init-blast dm? ]
+  hatch-blast 1 [
+    init-blast dm?
+    face target
+    fd 1
+  ]
 end
 
 ; dirt-related primitives
@@ -402,7 +422,12 @@ to heros::move-forward
 end
 
 to heros::create-blast
-  hatch-blast 1 [ init-blast true ]
+  let target ioda:my-target
+  hatch-blast 1 [
+    init-blast true
+    face target
+    fd 1
+  ]
 end
 
 to heros::increase-score
@@ -420,7 +445,7 @@ to blast::filter-neighbors
 end
 
 to blast::spread
-  if strength > 1 [
+  if blast::strong-enough? [
     set strength strength - 1
     foreach [0 90 180 270] [
       ; Verifier d'abord si il n'y a pas déjà un blast
@@ -429,15 +454,19 @@ to blast::spread
       hatch 1 [lt ? fd 1 lt 90 fd 1]
     ]
   ]
-  die
 end
 
 to blast::die
+  if diamond-maker? [hatch-diamonds 1 [init-diamond]]
   ioda:die ; effacer le blast ?
 end
 
 to-report blast::target-here?
   report ([patch-here] of ioda:my-target) = patch-here
+end
+
+to-report blast::nothing-here?
+  report count turtles-here - count blast-here = 0
 end
 
 ; wall-related primitives
@@ -452,11 +481,11 @@ end
 GRAPHICS-WINDOW
 482
 10
-727
-191
+1392
+941
 -1
 -1
-30.0
+36.0
 1
 10
 1
@@ -467,8 +496,8 @@ GRAPHICS-WINDOW
 0
 1
 0
-4
--4
+24
+-24
 0
 1
 1
@@ -640,7 +669,7 @@ CHOOSER
 level
 level
 "level0" "level1" "level2"
-0
+2
 
 MONITOR
 287
