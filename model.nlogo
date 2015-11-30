@@ -362,6 +362,10 @@ end
 
 ; dirt-related primitives
 
+to-report dirt::destructible?
+  report true
+end
+
 to dirt::die
   ioda:die
 end
@@ -669,7 +673,7 @@ CHOOSER
 level
 level
 "level0" "level1" "level2"
-2
+1
 
 MONITOR
 287

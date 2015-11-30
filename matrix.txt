@@ -63,3 +63,4 @@ blast		Kill		100		monsters	0
 blast		Destroy		100		walls	0
 blast		Destroy		100		rocks	0
 blast		Destroy		100		diamonds	0
+blast		Destroy		100		dirt	0
