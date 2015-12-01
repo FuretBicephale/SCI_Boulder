@@ -461,7 +461,7 @@ to blast::spread
 end
 
 to blast::die
-  if diamond-maker? [hatch-diamonds 1 [init-diamond]]
+  if (diamond-maker? and count turtles-here - count blast-here = 0) [hatch-diamonds 1 [init-diamond]]
   ioda:die ; effacer le blast ?
 end
 
@@ -470,7 +470,7 @@ to-report blast::target-here?
 end
 
 to-report blast::nothing-here?
-  report count turtles-here - count blast-here = 0
+  report count turtles-here - count blast-here - count walls-here with [not destructible?] = 0
 end
 
 ; wall-related primitives
@@ -485,8 +485,8 @@ end
 GRAPHICS-WINDOW
 482
 10
-1392
-941
+727
+221
 -1
 -1
 36.0
@@ -500,8 +500,8 @@ GRAPHICS-WINDOW
 0
 1
 0
-24
--24
+4
+-4
 0
 1
 1
@@ -673,7 +673,7 @@ CHOOSER
 level
 level
 "level0" "level1" "level2"
-1
+0
 
 MONITOR
 287
