@@ -20,7 +20,7 @@ parallel interaction Open
   condition	     closed?
   actions	     change-state
 end
-	 
+
 parallel interaction StartFalling
   trigger	     nothing-below?
   condition	     not:moving?
@@ -33,7 +33,7 @@ parallel interaction Fall
 end
 
 parallel interaction StopFalling
-  condition	     moving? 
+  condition	     moving?
   actions	     stop-moving
 end
 
@@ -49,7 +49,7 @@ end
 
 parallel interaction Dig
   trigger	     target-ahead?
-  condition	     moving? 
+  condition	     moving?
   actions	     target:die move-forward
 end
 
@@ -98,6 +98,15 @@ end
 
 parallel interaction Destroy
   trigger      target-here?
-  condition    target:destructible?  
+  condition    target:destructible?
   actions      target:die
+end
+
+parallel interaction Tick
+  actions tick
+end
+
+parallel interaction Boom
+  condition ready-to-explode?
+  actions   explode
 end

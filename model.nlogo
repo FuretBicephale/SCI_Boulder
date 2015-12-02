@@ -10,6 +10,7 @@ breed [rocks rock]
 breed [diamonds diamond]
 breed [dirt]
 breed [blast]
+breed [dynamites dynamite]
 
 globals       [ score nb-to-collect countdown ]
 heros-own     [ moving? orders ]
@@ -19,6 +20,7 @@ rocks-own     [ moving? ]
 walls-own     [ destructible? ]
 doors-own     [ open? ]
 blast-own     [ strength diamond-maker? ]
+dynamites-own      [ tick-till-boom ]
 
 to setup
   clear-all
@@ -93,6 +95,7 @@ to init-world
   set-default-shape diamonds "diamond"
   set-default-shape dirt "dirt"
   set-default-shape blast "star"
+  set-default-shape dynamites "banana"
   read-level (word level ".txt")
   set countdown 0
   set nb-to-collect count diamonds
@@ -156,6 +159,13 @@ to init-wall [ d ]
   set destructible? d
   set heading 0
   set color blue - 4
+end
+
+to init-dynamite [ ttb ]
+  ioda:init-agent
+  set tick-till-boom ttb
+  set heading 0
+  set color red
 end
 
 
@@ -407,7 +417,10 @@ to heros::handle-messages
     [ let m ?
       ifelse (m = "STOP")
         [ set moving? false]
-        [ set heading m set moving? true ]
+        [ ifelse (m = "TNT")
+          [hatch-dynamites 1 [init-dynamite 3]]
+          [set heading m set moving? true ]
+        ]
     ]
   set orders []
 end
@@ -451,6 +464,7 @@ end
 to blast::spread
   if blast::strong-enough? [
     set strength strength - 1
+    set heading 0
     foreach [0 90 180 270] [
       ; Verifier d'abord si il n'y a pas déjà un blast
       hatch 1 [lt ? fd 1]
@@ -480,6 +494,15 @@ end
 
 to walls::die
   ioda:die
+end
+
+; dynamite-related primitives
+to-report dynamites::ready-to-explode?
+  report tick-till-boom = 0
+end
+
+to dynamites::tick
+  set tick-till-boom tick-till-boom - 1
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -697,6 +720,23 @@ step-by-step?
 1
 -1000
 
+BUTTON
+256
+425
+319
+458
+TNT
+ask heros [ send-message \"TNT\" ]
+NIL
+1
+T
+OBSERVER
+NIL
+O
+NIL
+NIL
+1
+
 @#$#@#$#@
 ## WHAT IS IT?
 
@@ -751,6 +791,23 @@ arrow
 true
 0
 Polygon -7500403 true true 150 0 0 150 105 150 105 293 195 293 195 150 300 150
+
+banana
+false
+0
+Polygon -7500403 false true 25 78 29 86 30 95 27 103 17 122 12 151 18 181 39 211 61 234 96 247 155 259 203 257 243 245 275 229 288 205 284 192 260 188 249 187 214 187 188 188 181 189 144 189 122 183 107 175 89 158 69 126 56 95 50 83 38 68
+Polygon -7500403 true true 39 69 26 77 30 88 29 103 17 124 12 152 18 179 34 205 60 233 99 249 155 260 196 259 237 248 272 230 289 205 284 194 264 190 244 188 221 188 185 191 170 191 145 190 123 186 108 178 87 157 68 126 59 103 52 88
+Line -16777216 false 54 169 81 195
+Line -16777216 false 75 193 82 199
+Line -16777216 false 99 211 118 217
+Line -16777216 false 241 211 254 210
+Line -16777216 false 261 224 276 214
+Polygon -16777216 true false 283 196 273 204 287 208
+Polygon -16777216 true false 36 114 34 129 40 136
+Polygon -16777216 true false 46 146 53 161 53 152
+Line -16777216 false 65 132 82 162
+Line -16777216 false 156 250 199 250
+Polygon -16777216 true false 26 77 30 90 50 85 39 69
 
 bee 2
 true
