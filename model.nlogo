@@ -504,12 +504,18 @@ end
 to dynamites::tick
   set tick-till-boom tick-till-boom - 1
 end
+
+to dynamites::explode
+  let dm? false
+  hatch-blast 1 [init-blast dm?]
+  ioda:die
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
 482
 10
-727
-221
+1392
+941
 -1
 -1
 36.0
@@ -523,8 +529,8 @@ GRAPHICS-WINDOW
 0
 1
 0
-4
--4
+24
+-24
 0
 1
 1
@@ -696,7 +702,7 @@ CHOOSER
 level
 level
 "level0" "level1" "level2"
-0
+1
 
 MONITOR
 287
