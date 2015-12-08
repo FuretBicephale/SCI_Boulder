@@ -110,3 +110,8 @@ parallel interaction Boom
   condition ready-to-explode?
   actions   explode
 end
+
+parallel interaction Roll
+  condition not:moving? target-below?
+  actions roll
+end

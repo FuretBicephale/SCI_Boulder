@@ -284,6 +284,18 @@ to-report rocks::nothing-below?
   report default::nothing-below?
 end
 
+to-report rocks::nothing-ahead?
+  report default::nothing-ahead? 1
+end
+
+to-report rocks::nothing-right-and-ahead?
+  report not any? turtles-on patch-right-and-ahead 45 1
+end
+
+to-report rocks::nothing-left-and-ahead?
+  report not any? turtles-on patch-left-and-ahead 45 1
+end
+
 to-report rocks::moving?
   report default::moving?
 end
@@ -330,6 +342,38 @@ end
 
 to rocks::die
   ioda:die
+end
+
+to-report rocks::target-below?
+  report ([patch-here] of ioda:my-target) = (patch-at 0 -1)
+end
+
+to rocks::roll
+  let r random 2
+  let h heading
+  ifelse r = 0
+  [
+    set heading 90
+    ifelse rocks::nothing-ahead? and rocks::nothing-right-and-ahead?
+    [fd 1]
+    [
+      lt 180
+      if rocks::nothing-ahead? and rocks::nothing-left-and-ahead? [fd 1]
+    ]
+  ]
+
+  [
+    set heading -90
+    ifelse rocks::nothing-ahead? and rocks::nothing-left-and-ahead?
+    [fd 1]
+    [
+      lt 180
+      if rocks::nothing-ahead? and rocks::nothing-right-and-ahead? [fd 1]
+    ]
+  ]
+
+  set heading h
+
 end
 
 ; monsters-related primitives
@@ -514,11 +558,11 @@ end
 GRAPHICS-WINDOW
 482
 10
-1392
-941
+727
+191
 -1
 -1
-36.0
+30.0
 1
 10
 1
@@ -529,8 +573,8 @@ GRAPHICS-WINDOW
 0
 1
 0
-24
--24
+4
+-4
 0
 1
 1
@@ -701,8 +745,8 @@ CHOOSER
 108
 level
 level
-"level0" "level1" "level2"
-1
+"level0" "level1" "level2" "level_roll"
+0
 
 MONITOR
 287
