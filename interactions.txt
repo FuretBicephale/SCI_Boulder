@@ -115,3 +115,11 @@ parallel interaction Roll
   condition not:moving? target-below?
   actions roll
 end
+
+parallel interaction Grow
+  trigger can-grow?
+  actions grow
+end
+
+parallel interaction Transmute
+end

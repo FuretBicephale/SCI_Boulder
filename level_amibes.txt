@@ -1,0 +1,10 @@
+[10 8]
+XXXXXXXXXX
+XH      DX
+X........X
+X........X
+X..RRRRR.X
+X..R...R.O
+X..R A R.O
+XXXXXXXXXX
+

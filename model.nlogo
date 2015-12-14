@@ -11,6 +11,8 @@ breed [diamonds diamond]
 breed [dirt]
 breed [blast]
 breed [dynamites dynamite]
+breed [amibes amibe]
+
 
 globals       [ score nb-to-collect countdown ]
 heros-own     [ moving? orders ]
@@ -20,7 +22,8 @@ rocks-own     [ moving? ]
 walls-own     [ destructible? ]
 doors-own     [ open? ]
 blast-own     [ strength diamond-maker? ]
-dynamites-own      [ tick-till-boom ]
+dynamites-own [ tick-till-boom ]
+amibes-own    [ growth-speed time-to-grow ]
 
 to setup
   clear-all
@@ -75,7 +78,10 @@ to create-agent [ char ]
                             [ sprout-monsters 1 [ init-monster ]]
                             [ ifelse (char = ".")
                                 [ sprout-dirt 1 [ init-dirt ] ]
-                                [ ;;;;;; other agents ?
+                                [ ifelse (char = "A")
+                                  [ sprout-amibes 1 [ init-amibe ] ]
+                                  [ ;;;;;; other agents ?
+                                  ]
                                 ]
                             ]
                         ]
@@ -96,6 +102,7 @@ to init-world
   set-default-shape dirt "dirt"
   set-default-shape blast "star"
   set-default-shape dynamites "banana"
+  set-default-shape amibes "plant"
   read-level (word level ".txt")
   set countdown 0
   set nb-to-collect count diamonds
@@ -168,7 +175,22 @@ to init-dynamite [ ttb ]
   set color red
 end
 
+to init-amibe
+  ioda:init-agent
+  set color green
+  set heading 0
 
+  ifelse (difficulty = 0)
+  [set growth-speed random 20 + 50]
+  [
+    ifelse (difficulty = 1)
+    [set growth-speed random 15 + 25]
+    [set growth-speed random 10 + 5]
+  ]
+
+
+  set time-to-grow growth-speed
+end
 
 ; primitives that are shared by several breeds
 
@@ -268,6 +290,7 @@ end
 to-report diamonds::destructible?
   report true
 end
+
 to diamonds::die
   ioda:die
 end
@@ -554,15 +577,48 @@ to dynamites::explode
   hatch-blast 1 [init-blast dm?]
   ioda:die
 end
+
+; amibe-related primitives
+to amibes::filter-neighbors
+  ioda:filter-neighbors-in-radius 1
+end
+
+to amibes::tick
+  ifelse (time-to-grow != 0)
+  [set time-to-grow time-to-grow - 1]
+  [set time-to-grow growth-speed]
+end
+
+to-report amibes::growable-patch
+  report one-of neighbors4 with [not any? turtles-here with [breed != dirt] ]
+end
+
+to-report amibes::can-grow?
+  report time-to-grow = 0 and amibes::growable-patch != nobody
+end
+
+to amibes::grow
+  let p amibes::growable-patch
+  hatch-amibes 1 [
+    init-amibe
+    face p
+    ask (turtles-on p) with [breed = dirt] [die]
+    move-to p
+  ]
+end
+
+to amibes::die
+  ioda:die
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
 482
 10
-727
-191
+812
+297
 -1
 -1
-30.0
+32.0
 1
 10
 1
@@ -573,8 +629,8 @@ GRAPHICS-WINDOW
 0
 1
 0
-4
--4
+9
+-7
 0
 1
 1
@@ -741,12 +797,12 @@ nb-to-collect
 CHOOSER
 278
 63
-416
+418
 108
 level
 level
-"level0" "level1" "level2" "level_roll"
-0
+"level0" "level1" "level2" "level_roll" "level_amibes"
+4
 
 MONITOR
 287
@@ -786,6 +842,16 @@ O
 NIL
 NIL
 1
+
+CHOOSER
+282
+179
+420
+224
+difficulty
+difficulty
+0 1 2
+0
 
 @#$#@#$#@
 ## WHAT IS IT?
