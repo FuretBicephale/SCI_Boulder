@@ -590,7 +590,7 @@ to amibes::tick
 end
 
 to-report amibes::growable-patch
-  report one-of neighbors4 with [not any? turtles-here with [breed != dirt] ]
+  report one-of neighbors4 with [not any? turtles-here with [breed != dirt and breed != monsters] ]
 end
 
 to-report amibes::can-grow?
@@ -602,7 +602,6 @@ to amibes::grow
   hatch-amibes 1 [
     init-amibe
     face p
-    ask (turtles-on p) with [breed = dirt] [die]
     move-to p
   ]
 end
@@ -610,12 +609,16 @@ end
 to amibes::die
   ioda:die
 end
+
+to-report amibes::destructible?
+  report true
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
 482
 10
-812
-297
+1036
+425
 -1
 -1
 32.0
@@ -629,8 +632,8 @@ GRAPHICS-WINDOW
 0
 1
 0
-9
--7
+16
+-11
 0
 1
 1
@@ -851,7 +854,7 @@ CHOOSER
 difficulty
 difficulty
 0 1 2
-0
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -1243,7 +1246,7 @@ Line -16777216 false 247 15 247 90
 Rectangle -6459832 true false 240 90 255 300
 
 plant
-false
+true
 0
 Rectangle -7500403 true true 135 90 165 300
 Polygon -7500403 true true 135 255 90 210 45 195 75 255 135 285

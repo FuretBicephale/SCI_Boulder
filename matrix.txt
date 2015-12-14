@@ -51,6 +51,7 @@ monsters	Turn		 20 	doors		 1
 monsters	Turn		 20 	monsters	 1
 monsters	Turn		 20 	amibes	 1
 monsters	Explode		 30 	heros		 1
+monsters	Explode		 30 	amibes		 0
 
 heros		StopMoving	 100 	UPDATE
 heros		ReadOrders	 90 	UPDATE
@@ -61,13 +62,14 @@ heros		Explode		 100    monsters	 0
 heros		Push 	 20		rocks		 1
 
 blast		Spread		100		UPDATE
-blast		Die		100		UPDATE
+blast		Die			100		UPDATE
 blast		Kill		100		heros	0
 blast		Kill		100		monsters	0
 blast		Destroy		100		walls	0
 blast		Destroy		100		rocks	0
 blast		Destroy		100		diamonds	0
 blast		Destroy		100		dirt	0
+blast		Destroy		100		amibes	0
 
 dynamites Tick    100 UPDATE
 dynamites Boom 100
@@ -75,4 +77,4 @@ dynamites Boom 100
 amibes			Tick		20		UPDATE
 amibes			Grow		10		UPDATE
 amibes			Transmute	0		UPDATE
-amibes			Explode		10		monsters	0
+amibes			Kill		10		dirt	0

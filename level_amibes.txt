@@ -1,10 +1,14 @@
-[10 8]
-XXXXXXXXXX
-XH      DX
-X........X
-X........X
-X..RRRRR.X
-X..R...R.O
-X..R A R.O
-XXXXXXXXXX
+[17 12]
+XXXXXXXXXXXXXXXXX
+XHR            DX
+X...    ...   ..X
+X...    ...   ..X
+X..R    R R   R.X
+X..R    .M.   R.X
+X..R    . .   R.X
+X..R    . .   R.X
+X..R    . .   R.X
+X..R    . .   R.X
+X..R    .A.   R.O
+XXXXXXXXXXXXXXXXX
 

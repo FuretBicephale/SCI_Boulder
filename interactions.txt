@@ -92,7 +92,6 @@ parallel interaction Die
 end
 
 parallel interaction Kill
-  trigger      target-here?
   actions      target:die
 end
 
