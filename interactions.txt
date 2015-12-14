@@ -122,3 +122,8 @@ end
 
 parallel interaction Transmute
 end
+
+parallel interaction Crystallize
+  trigger will-crystallize?
+  actions crystallize
+end

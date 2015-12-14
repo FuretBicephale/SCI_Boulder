@@ -76,5 +76,6 @@ dynamites Boom 100
 
 amibes			Tick		20		UPDATE
 amibes			Grow		10		UPDATE
-amibes			Transmute	0		UPDATE
+amibes			Transmute	5		UPDATE
+amibes			Crystallize	0		UPDATE
 amibes			Kill		10		dirt	0

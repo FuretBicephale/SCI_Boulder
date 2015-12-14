@@ -23,7 +23,7 @@ walls-own     [ destructible? ]
 doors-own     [ open? ]
 blast-own     [ strength diamond-maker? ]
 dynamites-own [ tick-till-boom ]
-amibes-own    [ growth-speed time-to-grow ]
+amibes-own    [ growth-speed time-to-grow crystallizing?]
 
 to setup
   clear-all
@@ -179,6 +179,7 @@ to init-amibe
   ioda:init-agent
   set color green
   set heading 0
+  set crystallizing? false
 
   ifelse (difficulty = 0)
   [set growth-speed random 20 + 50]
@@ -599,11 +600,12 @@ end
 
 to amibes::grow
   let p amibes::growable-patch
-  hatch-amibes 1 [
+  hatch 1 [
     init-amibe
-    face p
+    ;face p
     move-to p
   ]
+  create-links-with amibes-on p ; link avec la nouvelle amibe
 end
 
 to amibes::die
@@ -612,6 +614,18 @@ end
 
 to-report amibes::destructible?
   report true
+end
+
+to-report amibes::will-crystallize?
+  let r random 1000
+  report (r < 5)
+end
+
+to amibes::crystallize
+  set crystallizing? true
+  ask link-neighbors with [breed = amibes and not crystallizing?] [amibes::crystallize]
+  hatch-rocks 1 [init-rock]
+  amibes::die
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -854,7 +868,7 @@ CHOOSER
 difficulty
 difficulty
 0 1 2
-1
+2
 
 @#$#@#$#@
 ## WHAT IS IT?
