@@ -14,7 +14,7 @@ breed [dynamites dynamite]
 breed [amibes amibe]
 
 
-globals       [ score nb-to-collect countdown ]
+globals       [ score nb-to-collect countdown tnt-count levelNumber ]
 heros-own     [ moving? orders ]
 diamonds-own  [ moving? ]
 monsters-own  [ moving? right-handed? ]
@@ -41,8 +41,30 @@ to go
   ifelse (not any? heros)
     [ ifelse (countdown = 0) [ user-message "GAME OVER !" stop ] [ set countdown countdown - 1 ]]
     [ if (all? heros [any? doors-here with [open?]])
-        [ user-message "CONGRATULATIONS !" stop ]
+        [ user-message "CONGRATULATIONS !" next-level stop ]
     ]
+
+end
+
+to next-level
+  clear-ticks
+  clear-turtles
+  clear-patches
+  clear-drawing
+  clear-all-plots
+
+  reset-ticks
+
+  set levelNumber levelNumber + 1
+  init-global
+  read-level (word "level" levelNumber ".txt")
+  if ( file-exists? (word "level" levelNumber ".txt"))
+    [set level (word "level" levelNumber)]
+
+  set countdown 0
+  set nb-to-collect count diamonds
+  ioda:setup
+  ioda:set-metric "Moore"
 
 end
 
@@ -104,8 +126,10 @@ to init-world
   set-default-shape dynamites "banana"
   set-default-shape amibes "plant"
   read-level (word level ".txt")
+  set levelNumber read-from-string substring level 5 6
   set countdown 0
   set nb-to-collect count diamonds
+  set tnt-count tnt-init-counter
 end
 
 to init-hero
@@ -486,7 +510,9 @@ to heros::handle-messages
       ifelse (m = "STOP")
         [ set moving? false]
         [ ifelse (m = "TNT")
-          [hatch-dynamites 1 [init-dynamite 3]]
+          [ if (tnt-count > 0)
+            [hatch-dynamites 1 [init-dynamite 3]
+            set tnt-count tnt-count - 1]]
           [set heading m set moving? true ]
         ]
     ]
@@ -631,8 +657,8 @@ end
 GRAPHICS-WINDOW
 482
 10
-1036
-425
+1292
+841
 -1
 -1
 32.0
@@ -646,8 +672,8 @@ GRAPHICS-WINDOW
 0
 1
 0
-16
--11
+24
+-24
 0
 1
 1
@@ -819,7 +845,7 @@ CHOOSER
 level
 level
 "level0" "level1" "level2" "level_roll" "level_amibes"
-4
+1
 
 MONITOR
 287
@@ -869,6 +895,32 @@ difficulty
 difficulty
 0 1 2
 2
+
+SLIDER
+18
+97
+190
+130
+tnt-init-counter
+tnt-init-counter
+0
+20
+10
+1
+1
+NIL
+HORIZONTAL
+
+MONITOR
+18
+152
+208
+197
+TNT Counter
+tnt-count
+17
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
