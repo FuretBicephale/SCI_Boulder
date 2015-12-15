@@ -127,3 +127,8 @@ parallel interaction Crystallize
   trigger will-crystallize?
   actions crystallize
 end
+
+parallel interaction Transform
+  condition	     moving? nothing-below?
+  actions rock-to-diamond
+end

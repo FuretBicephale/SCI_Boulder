@@ -12,6 +12,7 @@ breed [dirt]
 breed [blast]
 breed [dynamites dynamite]
 breed [amibes amibe]
+breed [magicwalls magicwall]
 
 
 globals       [ score nb-to-collect countdown tnt-count levelNumber ]
@@ -47,25 +48,10 @@ to go
 end
 
 to next-level
-  clear-ticks
-  clear-turtles
-  clear-patches
-  clear-drawing
-  clear-all-plots
-
-  reset-ticks
-
   set levelNumber levelNumber + 1
-  init-global
-  read-level (word "level" levelNumber ".txt")
   if ( file-exists? (word "level" levelNumber ".txt"))
     [set level (word "level" levelNumber)]
-
-  set countdown 0
-  set nb-to-collect count diamonds
-  ioda:setup
-  ioda:set-metric "Moore"
-
+  init-world
 end
 
 to read-level [ filename ]
@@ -102,7 +88,9 @@ to create-agent [ char ]
                                 [ sprout-dirt 1 [ init-dirt ] ]
                                 [ ifelse (char = "A")
                                   [ sprout-amibes 1 [ init-amibe ] ]
-                                  [ ;;;;;; other agents ?
+                                  [ ifelse (char = "W")
+                                    [sprout-magicwalls 1 [ init-magicwall ] ]
+                                    []
                                   ]
                                 ]
                             ]
@@ -125,6 +113,7 @@ to init-world
   set-default-shape blast "star"
   set-default-shape dynamites "banana"
   set-default-shape amibes "plant"
+  set-default-shape magicwalls "tile brick"
   read-level (word level ".txt")
   set levelNumber read-from-string substring level 5 6
   set countdown 0
@@ -192,9 +181,9 @@ to init-wall [ d ]
   set color blue - 4
 end
 
-to init-dynamite [ ttb ]
+to init-dynamite
   ioda:init-agent
-  set tick-till-boom ttb
+  set tick-till-boom tnt-tick-till-boom
   set heading 0
   set color red
 end
@@ -215,6 +204,12 @@ to init-amibe
 
 
   set time-to-grow growth-speed
+end
+
+to init-magicwall
+  ioda:init-agent
+  set heading 0
+  set color violet
 end
 
 ; primitives that are shared by several breeds
@@ -424,6 +419,11 @@ to rocks::roll
 
 end
 
+to rocks::rock-to-diamond
+  hatch-diamonds 1 [ init-diamond fd 1]
+  ioda:die
+end
+
 ; monsters-related primitives
 
 to monsters::filter-neighbors
@@ -511,7 +511,7 @@ to heros::handle-messages
         [ set moving? false]
         [ ifelse (m = "TNT")
           [ if (tnt-count > 0)
-            [hatch-dynamites 1 [init-dynamite 3]
+            [hatch-dynamites 1 [init-dynamite]
             set tnt-count tnt-count - 1]]
           [set heading m set moving? true ]
         ]
@@ -657,8 +657,8 @@ end
 GRAPHICS-WINDOW
 482
 10
-1292
-841
+1036
+425
 -1
 -1
 32.0
@@ -672,8 +672,8 @@ GRAPHICS-WINDOW
 0
 1
 0
-24
--24
+16
+-11
 0
 1
 1
@@ -840,12 +840,12 @@ nb-to-collect
 CHOOSER
 278
 63
-418
+458
 108
 level
 level
-"level0" "level1" "level2" "level_roll" "level_amibes"
-1
+"level0" "level1" "level2" "level3_roll" "level4_amibes" "level5_magicwall"
+5
 
 MONITOR
 287
@@ -897,10 +897,10 @@ difficulty
 2
 
 SLIDER
-18
-97
-190
-130
+26
+149
+198
+182
 tnt-init-counter
 tnt-init-counter
 0
@@ -912,15 +912,30 @@ NIL
 HORIZONTAL
 
 MONITOR
-18
-152
-208
-197
+26
+204
+216
+249
 TNT Counter
 tnt-count
 17
 1
 11
+
+SLIDER
+26
+105
+199
+138
+tnt-tick-till-boom
+tnt-tick-till-boom
+0
+100
+50
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?

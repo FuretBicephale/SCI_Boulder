@@ -1,0 +1,13 @@
+[17 12]
+XXXXXXXXXXXXXXXXX
+XHR      D     DX
+X...    ...   ..X
+X...    ...   ..X
+X..R    RRR   R.X
+X..R    ...   R.X
+X..R    xWx   R.X
+X..R    .W.   R.X
+X..R    . .   R.X
+X..R    .W.   R.X
+X..R    . .   R.O
+XXXXXXXXXXXXXXXXX
