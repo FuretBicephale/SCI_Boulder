@@ -324,7 +324,7 @@ to rocks::filter-neighbors
 end
 
 to-report rocks::nothing-below?
-  report default::nothing-below?
+  report default::nothing-below? or (any? magicwalls-on patch-at 0 -1 and not moving?)
 end
 
 to-report rocks::nothing-ahead?
