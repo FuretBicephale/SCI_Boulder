@@ -16,6 +16,7 @@ breed [magicwalls magicwall]
 
 
 globals       [ score nb-to-collect countdown tnt-count levelNumber ]
+patches-own   [ explored? ]
 heros-own     [ moving? orders ]
 diamonds-own  [ moving? ]
 monsters-own  [ moving? right-handed? ]
@@ -34,6 +35,9 @@ to setup
   ioda:setup
   ioda:set-metric "Moore"
   reset-ticks
+  if IA = TRUE [
+    ask patches [set explored? FALSE]
+  ]
 end
 
 to go
@@ -259,7 +263,6 @@ to default::wiggle
         ]
       ]
     ]
-    set moving? true
 end
 
 ; doors-related primitives
@@ -568,30 +571,51 @@ end
 
 to heros::decide
   default::wiggle
-  let diamonds-around diamonds-on neighbors
-  if count diamonds-around > 0 [
-    face one-of diamonds-around
+  ask patch-here [set explored? TRUE]
+  if count neighbors with [explored? = FALSE and count turtles-here = 0] > 0 [
+    face one-of neighbors with [explored? = FALSE and count turtles-here = 0]
   ]
-  let danger monsters-on neighbors
-  if count danger > 0
-    [face one-of danger
+  if ioda:my-neighbors != 0 [
+    let diamonds-around diamonds-on turtle-set ioda:my-neighbors
+    if count diamonds-around > 0 [
+      face one-of diamonds-around]
+    let monster-around monsters-on turtle-set ioda:my-neighbors
+    if count monster-around > 0 [
+      face one-of monster-around
+      lt 180]
+  ]
+
+  let blast-around blast-on neighbors
+  if count blast-around > 0
+    [face one-of blast-around
      lt 180]
-  set danger blast-on neighbors
-  if count danger > 0
-    [face one-of danger
-     lt 180]
-  let p patch-at 0 1
-  let rocks-over rocks-on p
-  let diamonds-over diamonds-on p
+
+  let p1 patch-at 0 1
+  let p2 patch-at 0 2
+  let rocks-over rocks-on (patch-set p1  p2)
+  let diamonds-over diamonds-on (patch-set p1 p2)
+
   if count rocks-over with [moving?] > 0 or count diamonds-over with [moving?] > 1 [
     set heading 90
     if not heros::nothing-ahead? [set heading 270]
     if not heros::nothing-ahead? [set heading 180]
   ]
-  let exit doors-on neighbors
-  if count exit > 0 [
-    face one-of exit
+
+  if ioda:my-neighbors != 0 [
+    let exit doors-on turtle-set ioda:my-neighbors
+    if count exit > 0 and nb-to-collect <= 0 [
+      face one-of exit
+    ]
   ]
+
+  let while-counter 0
+  while [(count rocks-on patch-ahead 1 > 0 or count walls-on patch-ahead 1 > 0 or count magicwalls-on patch-ahead 1 > 0 or count monsters-on patch-ahead 1 > 0 or count amibes-on patch-ahead 1 > 0) and while-counter < 4] [
+    lt 90
+    set while-counter while-counter + 1
+  ]
+
+  set moving? TRUE
+
 end
 
 ; blast-related primitives
@@ -783,7 +807,7 @@ halo-of-hero
 halo-of-hero
 1
 10
-5
+2
 1
 1
 NIL
@@ -942,7 +966,7 @@ CHOOSER
 difficulty
 difficulty
 0 1 2
-1
+2
 
 SLIDER
 26
