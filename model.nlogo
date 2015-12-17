@@ -51,7 +51,7 @@ to next-level
   set levelNumber levelNumber + 1
   if ( file-exists? (word "level" levelNumber ".txt"))
     [set level (word "level" levelNumber)]
-  init-world
+  setup
 end
 
 to read-level [ filename ]
@@ -844,7 +844,7 @@ CHOOSER
 108
 level
 level
-"level0" "level1" "level2" "level3_roll" "level4_amibes" "level5_magicwall"
+"level0" "level1" "level2" "level3" "level4" "level5"
 5
 
 MONITOR
@@ -894,7 +894,7 @@ CHOOSER
 difficulty
 difficulty
 0 1 2
-2
+1
 
 SLIDER
 26
