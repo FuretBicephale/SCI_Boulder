@@ -14,6 +14,8 @@ breed [dynamites dynamite]
 breed [amibes amibe]
 breed [magicwalls magicwall]
 
+directed-link-breed [amlinks amlink]
+
 
 globals       [ score nb-to-collect countdown tnt-count levelNumber ]
 patches-own   [ explored? ]
@@ -25,7 +27,7 @@ walls-own     [ destructible? ]
 doors-own     [ open? ]
 blast-own     [ strength diamond-maker? ]
 dynamites-own [ tick-till-boom ]
-amibes-own    [ growth-speed time-to-grow crystallizing?]
+amibes-own    [ growth-speed time-to-grow depth max-depth]
 
 to setup
   clear-all
@@ -91,7 +93,7 @@ to create-agent [ char ]
                             [ ifelse (char = ".")
                                 [ sprout-dirt 1 [ init-dirt ] ]
                                 [ ifelse (char = "A")
-                                  [ sprout-amibes 1 [ init-amibe ] ]
+                                  [ sprout-amibes 1 [ init-amibe 0 ] ]
                                   [ ifelse (char = "W")
                                     [sprout-magicwalls 1 [ init-magicwall ] ]
                                     []
@@ -192,18 +194,19 @@ to init-dynamite
   set color red
 end
 
-to init-amibe
+to init-amibe [d]
   ioda:init-agent
   set color green
   set heading 0
-  set crystallizing? false
+  set depth d
+  set max-depth d
 
   ifelse (difficulty = 0)
-  [set growth-speed random 20 + 50]
+  [set growth-speed random 20 + 20]
   [
     ifelse (difficulty = 1)
-    [set growth-speed random 15 + 25]
-    [set growth-speed random 10 + 5]
+    [set growth-speed random 10 + 10]
+    [set growth-speed random 5 + 5]
   ]
 
 
@@ -698,12 +701,13 @@ end
 
 to amibes::grow
   let p amibes::growable-patch
+  let d depth
   hatch 1 [
-    init-amibe
-    ;face p
+    init-amibe d + 1
+    face p
     move-to p
   ]
-  create-links-with amibes-on p ; link avec la nouvelle amibe
+  create-amlinks-to amibes-on p ; link avec la nouvelle amibe
 end
 
 to amibes::die
@@ -714,14 +718,33 @@ to-report amibes::destructible?
   report true
 end
 
+to-report amibes::is-root?
+  report in-amlink-neighbors = no-turtles
+end
+
+to amibes::update-depth
+  amibes::spread-depth 0
+end
+
+to amibes::spread-depth [d]
+  set depth d
+  set max-depth d
+  ask out-amlink-neighbors with [breed = amibes] [amibes::spread-depth d + 1]
+  let md max-depth
+  ask in-amlink-neighbors with [breed = amibes] [if (md > max-depth) [set max-depth md] ]
+end
+
+to-report amibes::belongs-to-big-colony?
+  report max-depth > 5
+end
+
 to-report amibes::will-crystallize?
-  let r random 1000
-  report (r < 5)
+  let r random (10000 / (max-depth + 1))
+  report r < 10 / (difficulty + 1)
 end
 
 to amibes::crystallize
-  set crystallizing? true
-  ask link-neighbors with [breed = amibes and not crystallizing?] [amibes::crystallize]
+  ask out-amlink-neighbors with [breed = amibes] [amibes::crystallize]
   hatch-rocks 1 [init-rock]
   amibes::die
 end

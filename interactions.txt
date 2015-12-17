@@ -130,8 +130,14 @@ parallel interaction Transmute
 end
 
 parallel interaction Crystallize
-  trigger will-crystallize?
+  trigger is-root?
+  condition belongs-to-big-colony? will-crystallize?
   actions crystallize
+end
+
+parallel interaction UpdateDepth
+  condition is-root?
+  actions update-depth
 end
 
 parallel interaction Transform

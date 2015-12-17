@@ -1,14 +1,13 @@
-[17 12]
-XXXXXXXXXXXXXXXXX
-XHR            DX
-X...    ...   ..X
-X...    ...   ..X
-X..R    R R   R.X
-X..R    .M.   R.X
-X..R    . .   R.X
-X..R    . .   R.X
-X..R    . .   R.X
-X..R    . .   R.X
-X..R    .A.   R.O
-XXXXXXXXXXXXXXXXX
-
+[25 12]
+XXXXXXXXXXXXXXXXXXXXXXXXX
+XHR                    DX
+X...    ...           ..X
+X...    ...           ..X
+X..R    R.R           R.X
+X..R   R.M.R          R.X
+X..R  ... ...         R.X
+X..R    . .           R.X
+X..R    . .    xxxxxx R.X
+X..R    . .    x    x R.X
+X..R    .A.    x A  x R.O
+XXXXXXXXXXXXXXXXXXXXXXXXX

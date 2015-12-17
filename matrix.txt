@@ -42,6 +42,11 @@ rocks		StopFalling 	 10 	amibes		 1
 rocks		Explode 		 50 	monsters	 1
 rocks		Explode		 	 50 	heros		 1
 rocks		Roll			 5		rocks		 1
+rocks		Roll			 5		diamonds	 1
+rocks		Roll			 5		walls	 	 1
+rocks		Roll			 5		dirt	 	 1
+rocks		Roll			 5		amibes	 	 1
+rocks		Roll			 5		doors	 	 1
 rocks   Transform  50   magicwalls  0
 
 monsters	Advance		 10
@@ -77,8 +82,9 @@ blast		Destroy		100		amibes	0
 dynamites Tick    100 UPDATE
 dynamites Boom 100
 
-amibes			Tick		20		UPDATE
-amibes			Grow		10		UPDATE
-amibes			Transmute	5		UPDATE
-amibes			Crystallize	0		UPDATE
-amibes			Kill		10		dirt	0
+amibes			Tick			100		UPDATE
+amibes			UpdateDepth		100		UPDATE
+amibes			Grow			100		UPDATE
+amibes			Crystallize		10
+amibes			Transmute		5
+amibes			Kill			80		dirt	0
