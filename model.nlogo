@@ -246,6 +246,22 @@ to default::move-forward
   move-to patch-ahead 1
 end
 
+to default::wiggle
+  let dir random 4
+  ifelse dir = 0
+    [set heading 0]
+    [ifelse dir = 1
+      [set heading 90]
+      [ifelse dir = 2
+        [set heading 180]
+        [if dir = 3
+          [set heading 270]
+        ]
+      ]
+    ]
+    set moving? true
+end
+
 ; doors-related primitives
 
 to-report doors::open?
@@ -546,6 +562,38 @@ to heros::increase-score
   set nb-to-collect nb-to-collect - 1
 end
 
+to-report heros::ia?
+  report IA
+end
+
+to heros::decide
+  default::wiggle
+  let diamonds-around diamonds-on neighbors
+  if count diamonds-around > 0 [
+    face one-of diamonds-around
+  ]
+  let danger monsters-on neighbors
+  if count danger > 0
+    [face one-of danger
+     lt 180]
+  set danger blast-on neighbors
+  if count danger > 0
+    [face one-of danger
+     lt 180]
+  let p patch-at 0 1
+  let rocks-over rocks-on p
+  let diamonds-over diamonds-on p
+  if count rocks-over with [moving?] > 0 or count diamonds-over with [moving?] > 1 [
+    set heading 90
+    if not heros::nothing-ahead? [set heading 270]
+    if not heros::nothing-ahead? [set heading 180]
+  ]
+  let exit doors-on neighbors
+  if count exit > 0 [
+    face one-of exit
+  ]
+end
+
 ; blast-related primitives
 to-report blast::strong-enough?
   report strength > 0
@@ -657,8 +705,8 @@ end
 GRAPHICS-WINDOW
 482
 10
-1036
-425
+1292
+841
 -1
 -1
 32.0
@@ -672,8 +720,8 @@ GRAPHICS-WINDOW
 0
 1
 0
-16
--11
+24
+-24
 0
 1
 1
@@ -845,7 +893,7 @@ CHOOSER
 level
 level
 "level0" "level1" "level2" "level3" "level4" "level5"
-5
+1
 
 MONITOR
 287
@@ -936,6 +984,17 @@ tnt-tick-till-boom
 1
 NIL
 HORIZONTAL
+
+SWITCH
+282
+233
+385
+266
+IA
+IA
+0
+1
+-1000
 
 @#$#@#$#@
 ## WHAT IS IT?

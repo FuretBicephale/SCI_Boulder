@@ -56,6 +56,7 @@ monsters	Explode		 30 	heros		 1
 monsters	Explode		 30 	amibes		 0
 
 heros		StopMoving	 100 	UPDATE
+heros   Decide       90   UPDATE
 heros		ReadOrders	 90 	UPDATE
 heros		Advance		 10
 heros		Dig		 20 	dirt		 1

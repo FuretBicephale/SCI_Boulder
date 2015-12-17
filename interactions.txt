@@ -59,8 +59,14 @@ parallel interaction StopMoving
   actions	     stop-moving
 end
 
+parallel interaction Decide
+  condition   ia?
+  actions     decide
+end
+
 parallel interaction ReadOrders
   trigger	     message-received?
+  condition    not:ia?
   actions	     handle-messages
 end
 
