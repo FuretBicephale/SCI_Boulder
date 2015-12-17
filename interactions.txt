@@ -127,6 +127,9 @@ parallel interaction Grow
 end
 
 parallel interaction Transmute
+  trigger is-root?
+  condition blocked-from-here?
+  actions transmute
 end
 
 parallel interaction Crystallize

@@ -27,7 +27,7 @@ walls-own     [ destructible? ]
 doors-own     [ open? ]
 blast-own     [ strength diamond-maker? ]
 dynamites-own [ tick-till-boom ]
-amibes-own    [ growth-speed time-to-grow depth max-depth]
+amibes-own    [ growth-speed time-to-grow depth max-depth blocked-from-here?]
 
 to setup
   clear-all
@@ -200,13 +200,14 @@ to init-amibe [d]
   set heading 0
   set depth d
   set max-depth d
+  set blocked-from-here? false
 
   ifelse (difficulty = 0)
-  [set growth-speed random 20 + 20]
+  [set growth-speed random 250 + 80]
   [
     ifelse (difficulty = 1)
-    [set growth-speed random 10 + 10]
-    [set growth-speed random 5 + 5]
+    [set growth-speed random 200 + 50]
+    [set growth-speed random 175 + 25]
   ]
 
 
@@ -695,8 +696,16 @@ to-report amibes::growable-patch
   report one-of neighbors4 with [not any? turtles-here with [breed != dirt and breed != monsters] ]
 end
 
+to-report amibes::is-blocked?
+  report amibes::growable-patch = nobody
+end
+
+to-report amibes::blocked-from-here?
+  report blocked-from-here?
+end
+
 to-report amibes::can-grow?
-  report time-to-grow = 0 and amibes::growable-patch != nobody
+  report time-to-grow = 0 and not amibes::is-blocked?
 end
 
 to amibes::grow
@@ -731,6 +740,7 @@ to amibes::spread-depth [d]
   set max-depth d
   ask out-amlink-neighbors with [breed = amibes] [amibes::spread-depth d + 1]
   let md max-depth
+  set blocked-from-here? (amibes::is-blocked? and not any? out-amlink-neighbors with [breed = amibes and not blocked-from-here?])
   ask in-amlink-neighbors with [breed = amibes] [if (md > max-depth) [set max-depth md] ]
 end
 
@@ -739,8 +749,8 @@ to-report amibes::belongs-to-big-colony?
 end
 
 to-report amibes::will-crystallize?
-  let r random (10000 / (max-depth + 1))
-  report r < 10 / (difficulty + 1)
+  let r random (100000 / (max-depth + 1))
+  report r < 5
 end
 
 to amibes::crystallize
@@ -748,12 +758,18 @@ to amibes::crystallize
   hatch-rocks 1 [init-rock]
   amibes::die
 end
+
+to amibes::transmute
+  ask out-amlink-neighbors with [breed = amibes] [amibes::transmute]
+  hatch-diamonds 1 [init-diamond]
+  amibes::die
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
 482
 10
 1292
-841
+425
 -1
 -1
 32.0
@@ -768,7 +784,7 @@ GRAPHICS-WINDOW
 1
 0
 24
--24
+-11
 0
 1
 1
@@ -940,7 +956,7 @@ CHOOSER
 level
 level
 "level0" "level1" "level2" "level3" "level4" "level5"
-1
+4
 
 MONITOR
 287
@@ -989,7 +1005,7 @@ CHOOSER
 difficulty
 difficulty
 0 1 2
-2
+0
 
 SLIDER
 26
@@ -1039,7 +1055,7 @@ SWITCH
 266
 IA
 IA
-0
+1
 1
 -1000
 
