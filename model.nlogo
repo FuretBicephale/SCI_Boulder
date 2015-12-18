@@ -577,16 +577,17 @@ end
 to heros::decide
   default::wiggle
 
-  ask patch-here [set explored? TRUE]
-  if count neighbors with [explored? = FALSE and not patches::obstacle-here?] > 0 [
-    face one-of neighbors with [explored? = FALSE and not patches::obstacle-here?]
-  ]
+  ask patch-here [set explored? TRUE set plabel explored?]
 
-  if [dijkstra-dist] of patch-here = 0 [ask patches with [dijkstra-dist != -1] [ set dijkstra-dist -1 set plabel dijkstra-dist ]]
+  ask patches with [dijkstra-dist != -1] [ set dijkstra-dist -1 ]
 
   if ioda:my-neighbors != 0 [
 
     let neighborhood turtle-set ioda:my-neighbors
+
+    if any? neighborhood with [explored? = FALSE and not patches::obstacle-here?] [
+      propagate-dist [patch-here] of neighborhood with [explored? = FALSE and not patches::obstacle-here?]
+    ]
 
     if any? (diamonds-on neighborhood) with [moving? = FALSE] [
       propagate-dist [patch-here] of (diamonds-on neighborhood) with [moving? = FALSE]
@@ -609,8 +610,10 @@ to heros::decide
     ]
 
     let target min-one-of neighbors4 with [dijkstra-dist >= 0] [dijkstra-dist]
-    if target != nobody [
+    ifelse target != nobody [
       face min-one-of neighbors4 with [dijkstra-dist >= 0] [dijkstra-dist]
+    ][
+      face max-one-of neighbors4 [dijkstra-dist]
     ]
 
   ]
@@ -626,9 +629,9 @@ end
 ; the immediate? flag indicates if the path is computed from only accessible
 ; patches or with possible ways through doors in unknown state
 to propagate-dist [ target ]
-  ask patches with [dijkstra-dist != -1] [ set dijkstra-dist -1 set plabel dijkstra-dist ]
+  ask patches with [dijkstra-dist != -1] [ set dijkstra-dist -1 ]
   let p patch-set target
-  ask p [ set dijkstra-dist 0 set plabel dijkstra-dist ]
+  ask p [ set dijkstra-dist 0 ]
   let s 0
   while [ any? p ]
     [ set s s + 1
@@ -639,9 +642,12 @@ end
 
 to propagate-danger [ target ]
   let p patch-set target
-  ask p [ set dijkstra-dist 100 set plabel dijkstra-dist ]
+  ask p [ set dijkstra-dist -2 set plabel dijkstra-dist ]
   let pp patch-set ([neighbors4] of p)
-  ask pp [ set dijkstra-dist 100 set plabel dijkstra-dist ]
+  ask pp [ set dijkstra-dist -2 set plabel dijkstra-dist ]
+  set p pp
+  set pp patch-set ([neighbors4] of p)
+  ask pp [ set dijkstra-dist -2 set plabel dijkstra-dist ]
 end
 
 ; blast-related primitives
@@ -791,7 +797,7 @@ GRAPHICS-WINDOW
 482
 10
 1292
-425
+841
 -1
 -1
 32.0
@@ -806,7 +812,7 @@ GRAPHICS-WINDOW
 1
 0
 24
--11
+-24
 0
 1
 1
@@ -868,7 +874,7 @@ halo-of-hero
 halo-of-hero
 1
 10
-4
+5
 1
 1
 NIL
@@ -978,7 +984,7 @@ CHOOSER
 level
 level
 "level0" "level1" "level2" "level3" "level4" "level5"
-4
+2
 
 MONITOR
 287
@@ -1095,7 +1101,7 @@ This file is a basic implementation of the "Boulder Dash" video game (1984) with
   * **Rolling stones** : Rocks can roll on pretty much anything if the patch adjacent to them (left or right) and the patch below are empty. Then it falls and can crush the hero or monsters.
   * **Amoebas** : Amoebas have the shape of a plant and each one of them grow through dirt and empty spaces (in their von Neumann neighborhood) at a random speed depending on the difficulty. When a colony reach a certain size, it have a chance to change into rocks. The bigger the colony, the higher the chance to become rocks. When a colony cannot grow further, it transmutes into diamonds.
   * **Magic Walls** : These are walls that let rocks (and only rocks) pass through them, changing them into diamonds in the process.
-  * **IA** :
+  * **AI** : The AI can be activated with the switch on the interface. The AI is a non omniscient AI and is able to see in its halo. It uses a Dijkstra algorithm and consider unexplored cells, diamonds and doors as attractor and monsters and moving rocks and diamonds as repulsor.
 
 ## HOW IT WORKS
 
@@ -1114,7 +1120,7 @@ the growth speed of the amoebas.
   * **tnt-tick-till-boom** : set the duration of the dynamites.
   * **tnt-init-counter** : set the initial amount of tnt carried by the hero.
   * **IA** : whether the hero should be handled by the program or not.
-  * **halo-of-hero** :
+  * **halo-of-hero** : The perception radius of the AI.
 
 
 ## HOW TO CITE
