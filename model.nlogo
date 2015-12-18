@@ -18,7 +18,7 @@ directed-link-breed [amlinks amlink]
 
 
 globals       [ score nb-to-collect countdown tnt-count levelNumber ]
-patches-own   [ explored? ]
+patches-own   [ explored? dijkstra-dist ]
 heros-own     [ moving? orders ]
 diamonds-own  [ moving? ]
 monsters-own  [ moving? right-handed? ]
@@ -39,6 +39,7 @@ to setup
   reset-ticks
   if IA = TRUE [
     ask patches [set explored? FALSE]
+    ask patches [set dijkstra-dist -1]
   ]
 end
 
@@ -575,51 +576,72 @@ end
 
 to heros::decide
   default::wiggle
+
   ask patch-here [set explored? TRUE]
-  if count neighbors with [explored? = FALSE and count turtles-here = 0] > 0 [
-    face one-of neighbors with [explored? = FALSE and count turtles-here = 0]
-  ]
-  if ioda:my-neighbors != 0 [
-    let diamonds-around diamonds-on turtle-set ioda:my-neighbors
-    if count diamonds-around > 0 [
-      face one-of diamonds-around]
-    let monster-around monsters-on turtle-set ioda:my-neighbors
-    if count monster-around > 0 [
-      face one-of monster-around
-      lt 180]
+  if count neighbors with [explored? = FALSE and not patches::obstacle-here?] > 0 [
+    face one-of neighbors with [explored? = FALSE and not patches::obstacle-here?]
   ]
 
-  let blast-around blast-on neighbors
-  if count blast-around > 0
-    [face one-of blast-around
-     lt 180]
-
-  let p1 patch-at 0 1
-  let p2 patch-at 0 2
-  let rocks-over rocks-on (patch-set p1  p2)
-  let diamonds-over diamonds-on (patch-set p1 p2)
-
-  if count rocks-over with [moving?] > 0 or count diamonds-over with [moving?] > 1 [
-    set heading 90
-    if not heros::nothing-ahead? [set heading 270]
-    if not heros::nothing-ahead? [set heading 180]
-  ]
+  if [dijkstra-dist] of patch-here = 0 [ask patches with [dijkstra-dist != -1] [ set dijkstra-dist -1 set plabel dijkstra-dist ]]
 
   if ioda:my-neighbors != 0 [
-    let exit doors-on turtle-set ioda:my-neighbors
-    if count exit > 0 and nb-to-collect <= 0 [
-      face one-of exit
+
+    let neighborhood turtle-set ioda:my-neighbors
+
+    if any? (diamonds-on neighborhood) with [moving? = FALSE] [
+      propagate-dist [patch-here] of (diamonds-on neighborhood) with [moving? = FALSE]
     ]
-  ]
+    if any? doors-on neighbors and nb-to-collect <= 0 [
+      propagate-dist [patch-here] of doors-on neighbors
+    ]
 
-  let while-counter 0
-  while [(count rocks-on patch-ahead 1 > 0 or count walls-on patch-ahead 1 > 0 or count magicwalls-on patch-ahead 1 > 0 or count monsters-on patch-ahead 1 > 0 or count amibes-on patch-ahead 1 > 0) and while-counter < 4] [
-    lt 90
-    set while-counter while-counter + 1
+    if any? monsters-on neighborhood [
+      propagate-danger [patch-here] of monsters-on neighborhood
+    ]
+    if any? (rocks-on neighborhood) with [moving? = TRUE] [
+      propagate-danger [patch-here] of (rocks-on neighborhood) with [moving? = TRUE]
+    ]
+    if any? (diamonds-on neighborhood) with [moving? = TRUE] [
+      propagate-danger [patch-here] of (diamonds-on neighborhood) with [moving? = TRUE]
+    ]
+    if any? blast-on neighborhood [
+      propagate-danger [patch-here] of blast-on neighborhood
+    ]
+
+    let target min-one-of neighbors4 with [dijkstra-dist >= 0] [dijkstra-dist]
+    if target != nobody [
+      face min-one-of neighbors4 with [dijkstra-dist >= 0] [dijkstra-dist]
+    ]
+
   ]
 
   set moving? TRUE
+end
 
+to-report patches::obstacle-here?
+  report any? walls-here or any? rocks-here or any? amibes-here or any? magicwalls-here or any? monsters-here
+end
+
+; dijkstra algorithm -> shortest path to specified agents (turtle procedure)
+; the immediate? flag indicates if the path is computed from only accessible
+; patches or with possible ways through doors in unknown state
+to propagate-dist [ target ]
+  ask patches with [dijkstra-dist != -1] [ set dijkstra-dist -1 set plabel dijkstra-dist ]
+  let p patch-set target
+  ask p [ set dijkstra-dist 0 set plabel dijkstra-dist ]
+  let s 0
+  while [ any? p ]
+    [ set s s + 1
+      let pp patch-set ([neighbors4 with [ not patches::obstacle-here? and distance one-of heros < halo-of-hero and ((dijkstra-dist < 0) or (dijkstra-dist > s)) ]] of p)
+      ask pp [ set dijkstra-dist s set plabel dijkstra-dist ]
+      set p pp ]
+end
+
+to propagate-danger [ target ]
+  let p patch-set target
+  ask p [ set dijkstra-dist 100 set plabel dijkstra-dist ]
+  let pp patch-set ([neighbors4] of p)
+  ask pp [ set dijkstra-dist 100 set plabel dijkstra-dist ]
 end
 
 ; blast-related primitives
@@ -846,7 +868,7 @@ halo-of-hero
 halo-of-hero
 1
 10
-2
+4
 1
 1
 NIL
@@ -1005,7 +1027,7 @@ CHOOSER
 difficulty
 difficulty
 0 1 2
-0
+2
 
 SLIDER
 26
@@ -1055,7 +1077,7 @@ SWITCH
 266
 IA
 IA
-1
+0
 1
 -1000
 
