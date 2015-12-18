@@ -1060,9 +1060,20 @@ IA
 -1000
 
 @#$#@#$#@
+# SCI Boulder Dash : Nicolas Cachera and Samuel Grandsir
+
 ## WHAT IS IT?
 
 This file is a basic implementation of the "Boulder Dash" video game (1984) within the IODA NetLogo extension.
+
+## FEATURES IMPLEMENTED
+
+  * **Blasts** : When the hero or a monster is crushed by a rock, it makes a blast that destroy everything destructible in a radius of 1 patch. When monsters kill the hero, a blast is also created.
+  * **Dynamites** : The hero can place dynamites that will explode after a certain amount of time, destroying everything destructible in a radius of 1 patch.
+  * **Rolling stones** : Rocks can roll on pretty much anything if the patch adjacent to them (left or right) and the patch below are empty. Then it falls and can crush the hero or monsters.
+  * **Amoebas** : Amoebas have the shape of a plant and each one of them grow through dirt and empty spaces (in their von Neumann neighborhood) at a random speed depending on the difficulty. When a colony reach a certain size, it have a chance to change into rocks. The bigger the colony, the higher the chance to become rocks. When a colony cannot grow further, it transmutes into diamonds.
+  * **Magic Walls** : These are walls that let rocks (and only rocks) pass through them, changing them into diamonds in the process.
+  * **IA** :
 
 ## HOW IT WORKS
 
@@ -1072,6 +1083,16 @@ A cave is initialized in the setup procedure. The main character has to dig the 
 ## HOW TO USE IT
 
 You just have to click on **`setup`**, then on **`go`**. Your aim is to endow the character and the other agents with a better behavior than the initial one.
+
+### Settable Parameters
+
+  * **Difficulty** : From 0 to 2 with increasing difficulty. The difficulty influences
+the growth speed of the amoebas.
+  * **Level** : You can choose the level to play. Then, press **Setup** to load it.
+  * **tnt-tick-till-boom** : set the duration of the dynamites.
+  * **tnt-init-counter** : set the initial amount of tnt carried by the hero.
+  * **IA** : whether the hero should be handled by the program or not.
+  * **halo-of-hero** :
 
 
 ## HOW TO CITE
